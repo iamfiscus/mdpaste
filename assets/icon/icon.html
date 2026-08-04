@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- mdpaste icon source: macOS rounded-rect + Lucide clipboard-paste.
+     Render: chrome --headless --screenshot (see iconset build commands).
+     1024x1024 transparent canvas, 824px icon body per Apple HIG (~80%). -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1024px; height: 1024px; background: transparent; }
+  .icon {
+    position: absolute; left: 100px; top: 100px;
+    width: 824px; height: 824px; border-radius: 184px;
+    background: linear-gradient(135deg, #6366f1 0%, #0ea5e9 55%, #22d3ee 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* subtle top-light for depth */
+  .icon::after {
+    content: ""; position: absolute; inset: 0; border-radius: 184px;
+    background: linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 38%);
+  }
+  svg { width: 448px; height: 448px; color: #fff; }
+</style>
+</head>
+<body>
+  <div class="icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 14h10" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v1.344" />
+      <path d="m17 18 4-4-4-4" />
+      <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113" />
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+    </svg>
+  </div>
+</body>
+</html>

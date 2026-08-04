@@ -1,10 +1,10 @@
 [package]
 name = "mdpaste"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/iamfiscus/mdpaste"
-description = "Copy rich text → hotkey → pastes as Markdown (Hammerspoon + Rust)"
+description = "Copy rich text, hit a hotkey, paste as Markdown — standalone daemon or Hammerspoon trigger."
 
 [[bin]]
 name = "mdpaste"
@@ -16,6 +16,9 @@ arboard = "3"
 # Same versions html2md 0.2.15 already pulls in, used for the sanitizer pre-pass.
 html5ever = "0.27"
 markup5ever_rcdom = "0.3"
+core-graphics = "0.24"
+core-foundation = "0.10"
+libc = "0.2"
 
 [profile.release]
 strip = true

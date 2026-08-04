@@ -8,6 +8,8 @@ use html5ever::tendril::TendrilSink;
 use html5ever::{namespace_url, ns, parse_document, Attribute, LocalName, ParseOpts, QualName};
 use markup5ever_rcdom::{Handle, Node, NodeData, RcDom, SerializableHandle};
 
+mod daemon;
+
 /// Elements removed wholesale (tag plus all contents) before Markdown
 /// conversion. These routinely leak CSS/JS/navigation noise into the output
 /// because html2md has no option to skip them.
@@ -259,7 +261,8 @@ fn print_usage() {
          Usage:\n  \
          mdpaste            Convert clipboard HTML -> Markdown, copy it back, and paste.\n  \
          mdpaste --dry-run  Same conversion, but only copies to clipboard (no paste).\n  \
-         mdpaste --test FILE.html   Convert an HTML file and print Markdown to stdout.\n\
+         mdpaste --test FILE.html   Convert an HTML file and print Markdown to stdout.\n  \
+         mdpaste daemon     Run the hotkey daemon: Ctrl+Alt+V converts the clipboard in place.\n\
          \n(--test works on any OS; the other modes need macOS.)"
     );
 }
@@ -277,6 +280,10 @@ fn main() {
         };
         println!("{}", convert(&html));
         return;
+    }
+
+    if args.len() == 2 && args[1] == "daemon" {
+        daemon::run();
     }
 
     if args.len() > 2 || (args.len() == 2 && args[1] != "--dry-run") {

@@ -26,9 +26,11 @@ hs.hotkey.bind({"ctrl", "alt"}, "v", nil, function()
   local out, status = hs.execute(mdpaste .. " 2>&1")
   if not status then
     local msg = (out or ""):gsub("%s+$", "")
-    if msg == "" then
-      msg = "nothing to convert (copy rich text first)"
+    -- "doesn't contain HTML" = plain-text copy, screenshot, etc. Not an
+    -- error worth alerting on — stay silent. Alert only on real failures
+    -- (permissions, binary crash).
+    if msg ~= "" and not msg:find("doesn't contain HTML", 1, true) then
+      hs.alert.show("mdpaste: " .. msg)
     end
-    hs.alert.show("mdpaste: " .. msg)
   end
 end)
