@@ -217,15 +217,22 @@ fi
 # the install; an unsigned binary installs and runs identically, it just needs
 # a fresh Accessibility grant.
 if command -v codesign >/dev/null 2>&1; then
+  # Preference order: our durable self-signed root (10y, survives rebuilds and
+  # reinstalls), then any Apple Development identity (stable until Xcode
+  # rotates it), then ad-hoc (fresh Accessibility grant after every update).
   if security find-identity -v -p codesigning 2>/dev/null | grep -q '"mdpaste"'; then
     SIGNER="mdpaste"
     echo "==> Signing with persistent self-signed 'mdpaste' certificate"
+  elif SIGNER="$(security find-identity -v -p codesigning 2>/dev/null | sed -n 's/.*"\(Apple Development: [^"]*\)".*/\1/p' | head -n 1)" && [ -n "$SIGNER" ]; then
+    echo "==> Signing with Apple Development identity: $SIGNER"
+    echo "    (Stable until the cert rotates; the 'mdpaste' self-signed cert is"
+    echo "     the longer-lived option — see README section 2.)"
   else
     SIGNER="-"
-    echo "==> No 'mdpaste' code-signing certificate found; ad-hoc signing"
+    echo "==> No persistent code-signing certificate found; ad-hoc signing"
     echo "    (Accessibility grant will need re-approval after each update."
-    echo "     Optional: create a self-signed 'mdpaste' Code Signing cert in"
-    echo "     Keychain Access to make the grant stable across rebuilds.)"
+    echo "     Create the self-signed 'mdpaste' Code Signing cert — see README"
+    echo "     section 2 — to make the grant stable across rebuilds.)"
   fi
   # Sign the CLI copy and the app bundle with the same identity.
   codesign --force --sign "$SIGNER" --identifier "$LABEL" "$BIN" 2>/dev/null \

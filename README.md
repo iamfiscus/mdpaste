@@ -65,7 +65,31 @@ cd mdpaste
 
 Note on paths: `~/bin` is not on your PATH by default. That's fine — the daemon is launched by absolute path. When running mdpaste by hand, use the full path: `~/bin/mdpaste`.
 
-Note on signing: macOS keys the Accessibility grant to the binary's code signature, and an ad-hoc signature changes every rebuild — so a rebuilt binary silently loses its grant. `install.sh` signs with a persistent self-signed certificate named `mdpaste` if you have one in your login keychain (one-time: Keychain Access > Certificate Assistant > Create a Certificate… > Self Signed Root / Code Signing), and falls back to ad-hoc signing otherwise. Works either way; the cert just saves you re-granting after updates.
+**Signing — make the Accessibility grant stable (one time, strongly recommended):** macOS keys the Accessibility grant to the code signature, and an ad-hoc (unsigned-developer) signature changes every rebuild — so a rebuilt binary silently loses its grant and you re-do the toggle dance. `install.sh` signs with, in order of preference: a persistent self-signed **`mdpaste`** cert (10-year, best), an **Apple Development** identity if you have one from Xcode (stable until it rotates), else ad-hoc.
+
+To create the durable cert — either route:
+
+- **GUI:** Keychain Access > Keychain Access menu > Certificate Assistant > Create a Certificate. Name: `mdpaste`, Identity Type: Self Signed Root, Certificate Type: **Code Signing**. Create (override the defaults warning), then in Keychain Access double-click the cert > Trust > "When using this certificate": **Always Trust**.
+- **CLI (automated):**
+
+  ```sh
+  openssl req -x509 -newkey rsa:2048 -keyout /tmp/mdpaste-key.pem -out /tmp/mdpaste-cert.pem \
+    -days 3650 -nodes -subj "/CN=mdpaste" \
+    -addext "basicConstraints=critical,CA:true" \
+    -addext "keyUsage=critical,digitalSignature,keyCertSign" \
+    -addext "extendedKeyUsage=critical,codeSigning"
+  openssl pkcs12 -export -legacy -out /tmp/mdpaste.p12 \
+    -inkey /tmp/mdpaste-key.pem -in /tmp/mdpaste-cert.pem -passout pass:mdpaste-tmp
+  security import /tmp/mdpaste.p12 -k ~/Library/Keychains/login.keychain-db \
+    -P mdpaste-tmp -T /usr/bin/codesign
+  security add-trusted-cert -r trustRoot -p codeSign \
+    -k ~/Library/Keychains/login.keychain-db /tmp/mdpaste-cert.pem
+  rm /tmp/mdpaste-key.pem /tmp/mdpaste.p12   # private key now lives only in your keychain
+  ```
+
+  (`-legacy` and the trust step are load-bearing: Apple's importer rejects OpenSSL 3's default PKCS#12 algorithms, and a self-signed root must be trusted for code signing before `codesign` will use it.)
+
+After the cert exists, re-run `./install.sh` — it re-signs with the stable identity, and from then on updates never invalidate the grant.
 
 ## 2b. Start the daemon
 
@@ -75,7 +99,9 @@ If you used `install.sh`, this is already done — it created the LaunchAgent pl
 launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.iamfiscus.mdpaste.plist"
 ```
 
-**What happens on first run — the one and only permission.** The daemon posts keystrokes itself, so it needs Accessibility. Because mdpaste is a plain binary (no app bundle), the permission entry is named after the executable — **"mdpaste"**, with a generic icon — in System Settings > Privacy & Security > Accessibility. On first launch the daemon asks macOS to prompt you; if no dialog appears, it falls back to printing instructions (check the log). Grant the permission and the daemon picks it up and starts listening — that's the whole onboarding. If you clicked **Don't Allow**, fix it by toggling "mdpaste" on in that list (no restart needed).
+**What happens on first run — the one and only permission.** The daemon posts keystrokes itself, so it needs Accessibility. It runs from a real (background-agent) app bundle at `~/Applications/mdpaste.app`, so the permission entry in System Settings > Privacy & Security > Accessibility is **"mdpaste" with the app icon** — toggle it on. On first launch the daemon asks macOS to prompt you; if no dialog appears, add/toggle it in that list manually. Grant the permission, restart the daemon once (launchd cache: `kill $(pgrep -f 'mdpaste daemon')` — the agent relaunches itself), and it starts listening. If you clicked **Don't Allow**, the fix is the same list entry. *(macOS caches grants per process — any Accessibility change needs one daemon restart to register.)*
+
+**Login auto-open starts it automatically.** The LaunchAgent has `RunAtLoad`, so `mdpaste daemon` comes up at every login and restarts if it crashes — nothing else to enable. It also appears under System Settings > **General > Login Items** ("Allow in the Background" section, with the mdpaste icon). To pause it without uninstalling: `launchctl disable "gui/$(id -u)/com.iamfiscus.mdpaste"` (re-enable with `launchctl enable "gui/$(id -u)/com.iamfiscus.mdpaste"`). To remove it fully: `./uninstall.sh`.
 
 **Check it's alive:**
 
