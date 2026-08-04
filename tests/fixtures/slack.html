@@ -1,0 +1,18 @@
+<html><head><meta charset="utf-8"><style>"p-message-pane"</style></head>
+<body>
+<div class="p-message_pane_message c-message" data-qa="message" role="listitem">
+<div class="c-message__body">
+<span class="c-message__sender" data-qa="sender_name">Jordan Fiscus</span>
+<span class="c-timestamp" data-qa="message_timestamp"><a class="c-timestamp__link" href="https://myteam.slack.com/archives/C0123/p1722512345678900" rel="noopener noreferrer">9:42 AM</a></span>
+</div>
+<div class="c-message_kit__text c-message__message" data-qa="message_text">
+<div dir="auto" class="c-message__text_body">Hey <span class="c-message__mention" style="background:#e8f5fb;" data-link-member-id="U0456">@sue</span>, can you check the deploy? The build is broken again 😅 and I pasted the error below.</div>
+<div dir="auto" class="c-message__text_body">Here is the relevant log output:</div>
+<pre class="c-mrkdwn__pre" data-stringify-type="pre">[ERROR] build failed at bundle step
+TypeError: Cannot read properties of undefined (reading 'split')
+    at makeBundle (build.js:42:11)</pre>
+<div dir="auto" class="c-message__text_body">Also see the <a class="c-link" href="https://status.example.com/incidents/1234" target="_blank" rel="noopener noreferrer">status page incident</a> 🚨 — it matches what we saw yesterday.</div>
+<div dir="auto" class="c-message__text_body">Run this command to reproduce: <code class="c-mrkdwn__code" data-stringify-type="code">npm run build --verbose</code></div>
+</div>
+</div>
+</body></html>

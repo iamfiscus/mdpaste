@@ -1,0 +1,43 @@
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>How Rust Achieves Memory Safety - Example Blog</title><style>.ad-slot{position:fixed}</style><script type="text/javascript">window.analytics = {}; // tracking pixel bootstrap</script></head>
+<body>
+<nav class="site-nav" style="display:flex;background:#222;" aria-label="Main navigation">
+<a href="/">Home</a><a href="/articles">Articles</a><a href="/about">About</a>
+<button class="nav-menu-btn" aria-label="Toggle menu">☰ Menu</button>
+</nav>
+<div class="ad-slot" id="ad-leaderboard-top" style="text-align:center;">
+<aside class="advertisement" data-ad="leaderboard"><a href="https://ads.example.com/click?zone=123">Advertisement: Try SuperCloud hosting — 50% off!</a></aside>
+</div>
+<main class="article-content" id="main-content" role="main">
+<div class="breadcrumb" style="font-size:12px;color:#888;"><a href="/articles">Articles</a> <span>&gt;</span> <a href="/articles/rust">Rust</a></div>
+<article>
+<header class="article-header">
+<h1 class="article-title" style="font-size:32px;">How Rust Achieves Memory Safety</h1>
+<div class="article-meta" style="color:#666;"><span class="author vcard">By <a class="url fn" href="/authors/jane">Jane Doe</a></span> · <time class="published" datetime="2025-06-01">June 1, 2025</time> · <span class="reading-time">8 min read</span>
+<div class="share-buttons" style="float:right;">
+<button class="share-btn share-twitter">Share on X</button>
+<button class="share-btn share-facebook">Share on Facebook</button>
+<button class="share-btn share-copy-link">Copy Link</button>
+</div>
+</div>
+</header>
+<p class="lede">Rust guarantees memory safety at compile time without a garbage collector. This article examines the ownership system that makes it possible.</p>
+<img class="hero-image" src="https://blog.example.com/images/ownership-diagram.png" alt="Diagram showing Rust ownership rules" width="800" height="400" loading="lazy" style="max-width:100%;" />
+<h2 id="ownership" class="section-heading" style="margin-top:2em;">The Ownership Model</h2>
+<p>Every value in Rust has a variable called its <b>owner</b>. There can only be one owner at a time, and when the owner goes out of scope, the value is <i>dropped</i>.</p>
+<ul class="key-points">
+<li>Each value has one owner.</li>
+<li>Values are moved, not copied, by default.</li>
+<li>Borrowing rules are checked at compile time.</li>
+</ul>
+<p>Learn more in the <a href="https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html" rel="noopener" target="_blank">official Rust book chapter on ownership</a>.</p>
+</article>
+<aside class="newsletter-signup" style="border:1px solid #ccc;padding:1em;" aria-label="Newsletter">
+<h3>Don't miss a post!</h3>
+<p>Subscribe to our weekly newsletter.</p>
+<form action="/subscribe" method="post"><input type="email" placeholder="you@example.com" /><button type="submit">Subscribe</button></form>
+</aside>
+</main>
+<div class="ad-slot" id="ad-footer" style="text-align:center;"><aside class="advertisement" data-ad="footer">[AD SLOT 728x90]</aside></div>
+<footer class="site-footer" style="background:#f4f4f4;"><p>© 2025 Example Blog. <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a></p></footer>
+<script type="text/javascript">gtag('config', 'UA-12345');</script>
+</body></html>
