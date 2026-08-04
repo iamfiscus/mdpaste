@@ -1,0 +1,52 @@
+name: release
+
+# Cut a release by pushing a tag: git tag v0.1.0 && git push origin v0.1.0
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  REF_NAME: ${{ github.ref_name }}
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust targets
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - name: Build both architectures
+        run: |
+          cargo build --release --target aarch64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
+
+      - name: Make universal binary
+        run: |
+          mkdir -p dist
+          lipo -create \
+            target/aarch64-apple-darwin/release/mdpaste \
+            target/x86_64-apple-darwin/release/mdpaste \
+            -output dist/mdpaste
+          strip dist/mdpaste
+          lipo -info dist/mdpaste
+
+      - name: Package
+        run: |
+          cd dist
+          zip "mdpaste-${REF_NAME}-macos-universal.zip" mdpaste
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${REF_NAME}" \
+            "dist/mdpaste-${REF_NAME}-macos-universal.zip" \
+            --title "mdpaste ${REF_NAME}" \
+            --generate-notes \
+            --verify-tag

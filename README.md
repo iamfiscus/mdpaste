@@ -16,7 +16,7 @@ brew install --cask hammerspoon
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Skip the rustup line if `cargo --version` already works. (`brew install rust` also works, but rustup is the standard way to manage Rust toolchains. Note that `brew install --cask hammerspoon rust` fails — `rust` is a formula, not a cask, so it can't ride along on the cask install.)
+Rust is only needed if you build from source (Option B in section 2) — skip this entirely if you're using a prebuilt release. (`brew install rust` also works, but rustup is the standard way to manage Rust toolchains. Note that `brew install --cask hammerspoon rust` fails — `rust` is a formula, not a cask, so it can't ride along on the cask install.)
 
 **Permissions — Hammerspoon needs two grants:**
 
@@ -25,18 +25,27 @@ Skip the rustup line if `cargo --version` already works. (`brew install rust` al
 
 The Rust binary and its `osascript` calls run under Hammerspoon's process identity (responsible-process attribution), so they inherit those grants — nothing else needs its own permission.
 
-## 2. Build the binary
+## 2. Install the binary
 
-Get the code:
+**Option A — prebuilt binary** (no Rust needed; macOS universal, runs on Apple Silicon and Intel):
+
+```sh
+# from https://github.com/iamfiscus/mdpaste/releases (adjust version):
+curl -L -o /tmp/mdpaste.zip https://github.com/iamfiscus/mdpaste/releases/latest/download/mdpaste-v0.1.0-macos-universal.zip
+unzip /tmp/mdpaste.zip -d /tmp/mdpaste-bin
+mkdir -p ~/bin
+cp /tmp/mdpaste-bin/mdpaste ~/bin/
+chmod +x ~/bin/mdpaste
+xattr -d com.apple.quarantine ~/bin/mdpaste   # bypass Gatekeeper's "unverified developer" block (binaries downloaded unsigned from the web get this until notarized)
+```
+
+The `xattr` line is required once: mdpaste is not signed with an Apple Developer ID, so macOS would otherwise refuse to run it. (If you'd rather not bypass that, use Option B and build it yourself.)
+
+**Option B — build from source** (needs Rust from section 1):
 
 ```sh
 git clone https://github.com/iamfiscus/mdpaste.git
 cd mdpaste
-```
-
-Then build and install:
-
-```sh
 cargo build --release
 mkdir -p ~/bin
 cp target/release/mdpaste ~/bin/
